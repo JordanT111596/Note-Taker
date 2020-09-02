@@ -8,11 +8,12 @@ const dataBase = require("./db/db.json")
 // Sets up the Express App
 // =============================================================
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Sets up the Express app to handle data parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "public")));
 
 // Basic route that sends the user to the notes page
 app.get("/notes", function (req, res) {
@@ -26,12 +27,8 @@ app.get("*", function (req, res) {
 });
 // API route that reads the db.json file and returns saved notes as JSON
 app.get("/api/notes", function (req, res) {
-    fs.readFile(dataBase, "utf8", function (err, data) {
-        if (err) throw err;
-        data = JSON.parse(data);
-        return res.json(data);
+        return res.json(dataBase);
     });
-});
 
 // Create New Notes - takes in JSON input
 app.post("/api/notes", function (req, res) {
