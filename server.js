@@ -34,16 +34,25 @@ app.get("*", function (req, res) {
 
 // Create New Notes - takes in JSON input
 app.post("/api/notes", function (req, res) {
+    //Grabs user input and sets into variable
     const newNote = req.body;
+    //sets random id using uniqID to key of ID
     newNote.id = uniqID("note-");
     console.log(newNote.id);
+    //pushes the new note into the db.json
     dataBase.push(newNote);
     console.log(newNote);
+    fs.writeFile(path.join(__dirname, "./db/db.json"), JSON.stringify(dataBase), function(err) {
+        if (err) throw err;
+        res.json([dataBase]);
+    });
+    console.log(dataBase);
 });
 
 // Delete saved notes
 app.delete("/api/notes/:id", function (req, res) {
     const id = req.params.id;
+    console.log(id);
 });
 
 // Starts the server to begin listening
