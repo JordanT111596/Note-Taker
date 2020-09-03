@@ -17,23 +17,21 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Basic route that sends the user to the notes page
-app.get("/notes", function (req, res) {
+app.get("/notes", (req, res) => {
     res.sendFile(path.join(__dirname, "public/notes.html"));
 });
 
 
 // API route that reads the db.json file and returns saved notes as JSON
-app.get("/api/notes", function (req, res) {
-    return res.json(dataBase);
-});
+app.get("/api/notes", (req, res) => res.json(dataBase));
 
 // Basic route that sends the user to the index page
-app.get("*", function (req, res) {
+app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
 // Create New Notes - takes in JSON input
-app.post("/api/notes", function (req, res) {
+app.post("/api/notes", (req, res) => {
     //Grabs user input and sets into variable
     const newNote = req.body;
     //sets random id using uniqID to key of ID
@@ -41,7 +39,7 @@ app.post("/api/notes", function (req, res) {
     console.log(newNote.id);
     //pushes the new note into the db.json
     dataBase.push(newNote);
-    console.log(newNote);
+    //writes new item to database
     fs.writeFile(path.join(__dirname, "./db/db.json"), JSON.stringify(dataBase), function (err) {
         if (err) throw err;
         res.json([dataBase]);
@@ -49,9 +47,9 @@ app.post("/api/notes", function (req, res) {
 });
 
 // Delete saved notes
-app.delete("/api/notes/:id", function (req, res) {
+app.delete("/api/notes/:id", (req, res) => {
         dataBase = dataBase.filter(val => val.id !== req.params.id);
-        console.log(dataBase)
+        //writes out item from database
         fs.writeFile(path.join(__dirname, "./db/db.json"), JSON.stringify(dataBase), "utf8", function (err) {
             if (err) throw err;
             res.json(dataBase);
@@ -60,6 +58,6 @@ app.delete("/api/notes/:id", function (req, res) {
 
 // Starts the server to begin listening
 // =============================================================
-app.listen(PORT, function () {
+app.listen(PORT, () => {
     console.log("App listening on PORT " + PORT);
 });
