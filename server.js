@@ -16,6 +16,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
+// function readNote() {
+//     const notes = JSON.parse(fs.readFileSync(path.join(__dirname, "db/db.json"), "utf8")) || [];
+//     console.log(notes);
+//     return notes;
+// }
+
+// function writeNote(notes) {
+//     fs.writeFileSync(path.join(__dirname, "db/db.json"), JSON.stringify(notes));
+// }
+
 // Basic route that sends the user to the notes page
 app.get("/notes", function (req, res) {
     res.sendFile(path.join(__dirname, "public/notes.html"));
@@ -42,17 +52,26 @@ app.post("/api/notes", function (req, res) {
     //pushes the new note into the db.json
     dataBase.push(newNote);
     console.log(newNote);
-    fs.writeFile(path.join(__dirname, "./db/db.json"), JSON.stringify(dataBase), function(err) {
+    fs.writeFile(path.join(__dirname, "./db/db.json"), JSON.stringify(dataBase), function (err) {
         if (err) throw err;
         res.json([dataBase]);
     });
-    console.log(dataBase);
 });
 
 // Delete saved notes
 app.delete("/api/notes/:id", function (req, res) {
-    const id = req.params.id;
-    console.log(id);
+    fs.readFile(path.join(__dirname, "./db/db.json"), "utf8", function (err, data) {
+        if (err) throw err;
+        let newDataBase = JSON.parse([data]);
+        console.log(newDataBase);
+        newDataBase = newDataBase.filter(function (notes) {
+            return notes.id !== req.params.id;
+        });
+        fs.writeFile(path.join(__dirname, "./db/db.json"), JSON.stringify([...newDataBase]), "utf8", function (err) {
+            if (err) throw err;
+            res.json([dataBase]);
+        })
+    });
 });
 
 // Starts the server to begin listening
