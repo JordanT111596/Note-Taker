@@ -3,7 +3,7 @@
 const express = require("express");
 const path = require("path");
 const fs = require("fs");
-const dataBase = require("./db/db.json");
+let dataBase = require("./db/db.json");
 const uniqID = require("uniqid");
 
 // Sets up the Express App
@@ -15,16 +15,6 @@ const PORT = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
-
-// function readNote() {
-//     const notes = JSON.parse(fs.readFileSync(path.join(__dirname, "db/db.json"), "utf8")) || [];
-//     console.log(notes);
-//     return notes;
-// }
-
-// function writeNote(notes) {
-//     fs.writeFileSync(path.join(__dirname, "db/db.json"), JSON.stringify(notes));
-// }
 
 // Basic route that sends the user to the notes page
 app.get("/notes", function (req, res) {
@@ -60,18 +50,12 @@ app.post("/api/notes", function (req, res) {
 
 // Delete saved notes
 app.delete("/api/notes/:id", function (req, res) {
-    fs.readFile(path.join(__dirname, "./db/db.json"), "utf8", function (err, data) {
-        if (err) throw err;
-        let newDataBase = JSON.parse([data]);
-        console.log(newDataBase);
-        newDataBase = newDataBase.filter(function (notes) {
-            return notes.id !== req.params.id;
-        });
-        fs.writeFile(path.join(__dirname, "./db/db.json"), JSON.stringify([...newDataBase]), "utf8", function (err) {
+        dataBase = dataBase.filter(val => val.id !== req.params.id);
+        console.log(dataBase)
+        fs.writeFile(path.join(__dirname, "./db/db.json"), JSON.stringify(dataBase), "utf8", function (err) {
             if (err) throw err;
-            res.json([dataBase]);
-        })
-    });
+            res.json(dataBase);
+        }) 
 });
 
 // Starts the server to begin listening
